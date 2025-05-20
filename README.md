@@ -1,10 +1,88 @@
-# 用户指引
-
 本仓库用于记录复现 [FastUMI](https://fastumi.com/)过程，并扩展适配到 Realman Gen72 机械臂，包括硬件适配，数据采集，模型训练和推理执行,并完成一个抓取示例。
 
-## 1. 硬件环境
+## 1. 项目结构
 
-### 1.1 采集夹爪
+```
+UMI/
+├── data/               # 存储采集的数据和数据集
+├── models/            # 存储训练好的模型
+├── scripts/           # 实用脚本
+├── src/               # 源代码
+│   ├── data_collection/    # 数据采集模块
+│   ├── data_processing/    # 数据处理模块
+│   ├── training/          # 模型训练模块
+│   ├── inference/         # 模型推理模块
+│   └── robot_control/     # 机械臂控制模块
+├── tests/             # 单元测试
+├── docs/              # 文档
+└── configs/           # 配置文件
+```
+
+### 1.1 安装要求
+
+- Python 3.8+
+- CUDA (用于GPU加速, 可选)
+- ROS (用于机器人控制)
+
+### 1.2 安装步骤
+
+1. 克隆仓库：
+```bash
+git clone https://github.com/CortexNest/UMI.git
+cd UMI
+```
+
+2. 创建虚拟环境：
+```bash
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# 或
+.\venv\Scripts\activate  # Windows
+```
+
+3. 安装依赖：
+```bash
+pip install -r requirements.txt
+```
+
+4. 安装 pre-commit hooks：
+```bash
+pre-commit install
+```
+
+### 1.3 代码质量工具
+
+项目使用 pre-commit 在提交代码前自动运行检查：
+
+```bash
+pre-commit run --all-files  # 手动运行所有检查
+```
+
+### 1.4 使用方法
+
+1. 数据采集：
+```bash
+python src/data_collection/collect.py --config configs/data_collection.yaml
+```
+
+2. 数据处理：
+```bash
+python src/data_processing/process.py --config configs/data_processing.yaml
+```
+
+3. 模型训练：
+```bash
+python src/training/train.py --config configs/training.yaml
+```
+
+4. 模型推理：
+```bash
+python src/inference/infer.py --config configs/inference.yaml
+```
+
+## 2. 硬件环境
+
+### 2.1 采集夹爪
 采集端使用FastUMI采集设备，硬件列表及制作：
 
 | Device Name | Google Drive 3D Model | Link (Amazon) | Link (Taobao) |
@@ -33,33 +111,33 @@
 | T265 Mount V2 | [Download Link](https://drive.google.com/file/d/1_XOqXdYx--KOUCjkRI4ubGNVTrKC8_7T/view?usp=drive_link) | | |
 | Markers | [Download Link](https://drive.google.com/file/d/1mi3dfh_kN559bwykRgol0a7hC730_6wT/view?usp=drive_link) | | |
 
-![效果图](./data_collection/assets/gripper.png)
+![效果图](./docs/assets/gripper.png)
 
-### 1.2 机械臂
+### 2.2 机械臂
 机械臂使用[Realman Gen72-B](https://www.realman-robotics.cn/products/gen72b)
-![效果图](./data_collection/assets/gen72_with_lebai.jpg)
+![效果图](./docs/assets/gen72_with_lebai.jpg)
 
-### 1.3 执行末端
-执行末端使用乐白[LMG-90](https://lebai.ltd/portfolio-item/lmg-90/), 并在其之上设计了Gopro[连接件](./data_collection/assets/lebai_mount.stp)，可以使用3D打印；
+### 2.3 执行末端
+执行末端使用乐白[LMG-90](https://lebai.ltd/portfolio-item/lmg-90/), 并在其之上设计了Gopro[连接件](./docs/assets/lebai_mount.stp)，可以使用3D打印；
 
-![效果图](./data_collection/assets/lebai_mount.jpg)
+![效果图](./docs/assets/lebai_mount.jpg)
 
-## 2. 数据采集
+## 3. 数据采集
 
-本仓库基于 FastUMI [采集代码](https://github.com/OneStarRobotics/FastUMI_Data)，但对其做了精简，可以使用FastUMI代码，也可以使用本仓库采集代码，数据采集步骤参考[数据采集](./data_collection/README.md)
+本仓库基于 FastUMI [采集代码](https://github.com/OneStarRobotics/FastUMI_Data)，但对其做了一些优化，数据采集步骤参考[数据采集](./docs/data_collection.md)
 
-## 3. 模型训练及推理执行
+## 4. 模型训练及推理执行
 
 FastUMI没有开放模型训练代码，本仓库补充了ACT算法及DP算法，可以使用不同的算法进行实验；
 
-### 3.1 ACT（Action Chucking with Transformer) 算法
+### 4.1 ACT（Action Chucking with Transformer) 算法
 参考 [ACT 算法](./algorithms/ACT/README.md)
 
-![推理及执行效果](./data_collection/assets/act_cube.gif)
+![推理及执行效果](./docs/assets/act_cube.gif)
 
-### 3.2 DP(Difussion Policy) 算法
+### 4.2 DP(Difussion Policy) 算法
 
-## 4. 路线图
+## 5. 路线图
 - 移植ACT算法，使其适配采集数据格式，能够进行任务训练和推理, 能够控制Gen72-B机械臂执行任务
   - [x] 支持基于FastUMI共公开数据集的算法训练和推理
   - [x] 支持基于自采集数据的算法训练和推理
@@ -73,6 +151,33 @@ FastUMI没有开放模型训练代码，本仓库补充了ACT算法及DP算法�
   - [ ] 存储数据为 [ARIO](https://ario-dataset.github.io/) 格式
   - [ ] 基于Dora框架运行ACT训练代码
   - [ ] 基于Dora框架运行ACT推理代码
-## 5. 现状和不足
+## 6. 现状和不足
  - ACT算法目前可以完成将物体放到篮子里的任务，但泛化能力表现不足，待优化；
  - DP算法在仿真环境下可以完成从采集到训练到推理执行任务，但基于实际采集的数据暂无法很好执行；
+
+
+## 7. 贡献指南
+
+1. Fork 项目
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 创建 Pull Request
+
+### 8. 代码提交规范
+
+- 提交前请确保通过所有代码检查
+- 遵循项目的代码风格指南
+- 添加适当的类型注解
+- 编写清晰的文档字符串
+- 添加必要的单元测试
+
+## 9. 许可证
+
+本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件
+
+## 10. 联系方式
+
+项目维护者 - [@yourusernamCortexNest‌e](https://github.com/CortexNest‌)
+
+项目链接: [https://github.com/Core/CortexNest‌](https://github.com/CortexNest‌/UMI)

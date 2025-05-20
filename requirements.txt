@@ -1,0 +1,36 @@
+# 基础依赖
+torchvision
+torch
+pyquaternion
+pyyaml
+rospkg
+pexpect
+mujoco==2.3.7
+dm_control==1.0.14
+matplotlib
+einops
+packaging
+h5py
+ipython
+opencv-contrib-python
+ikpy
+pyrealsense2
+csvkit
+apriltag
+pandas
+
+# 工具和工具包
+tqdm>=4.62.0
+pyyaml>=5.4.0
+python-dotenv>=0.19.0
+pytest>=6.2.0  # 用于测试
+black>=21.7b0  # 代码格式化
+flake8>=3.9.0  # 代码检查
+
+# 代码质量工具
+ruff>=0.1.0  # 快速的 Python linter
+mypy>=1.0.0  # 静态类型检查
+isort>=5.12.0  # import 语句排序
+pre-commit>=3.0.0  # Git hooks 管理
+pylint>=2.17.0  # 代码分析
+pydocstyle>=6.3.0  # 文档风格检查
