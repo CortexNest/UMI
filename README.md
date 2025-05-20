@@ -178,6 +178,6 @@ FastUMI没有开放模型训练代码，本仓库补充了ACT算法及DP算法�
 
 ## 10. 联系方式
 
-项目维护者 - [@yourusernamCortexNest‌e](https://github.com/CortexNest‌)
+项目维护者 - [@CortexNest‌](https://github.com/CortexNest‌)
 
 项目链接: [https://github.com/Core/CortexNest‌](https://github.com/CortexNest‌/UMI)
