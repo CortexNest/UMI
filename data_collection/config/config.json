@@ -1,0 +1,21 @@
+{
+  "device_settings": {
+      "robot_type": "GEN72",
+      "data_dir": "./",
+      "device": "cpu"
+  },
+  "task_config": {
+      "episode_len": 180,
+      "state_dim": 7,
+      "action_dim": 7,
+      "cam_width": 1920,
+      "cam_height": 1080,
+      "camera_names": ["front"],
+      "camera_port": 0,
+      "ros": {
+          "video_topic": "/usb_cam/image_raw",
+          "trajectory_topic": "/camera/odom/sample",
+          "queue_size": 1000
+      }
+  }
+}
