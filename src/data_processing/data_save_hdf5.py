@@ -8,31 +8,14 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-# Load configuration from config.json
-with open("config/config.json") as f:
-    config = json.load(f)
+def load_config():
+    """Load configuration from config file."""
+    with open("configs/data_collection.json") as f:
+        config = json.load(f)
+    return config
 
-TASK_CONFIG = config["task_config"]
-cfg = TASK_CONFIG
-
-# Parse command line arguments
-parser = argparse.ArgumentParser()
-parser.add_argument("--task", type=str, default="grasp_cube_v1_22")
-parser.add_argument("--num_episodes", type=int, default=6)
-args = parser.parse_args()
-task = args.task
-num_episodes = args.num_episodes
-
-# Data path
-data_path = os.path.join(config["device_settings"]["data_dir"], "dataset", str(task))
-
-IMAGE_PATH = os.path.join(data_path, "camera/")
-CSV_PATH = os.path.join(data_path, "csv/")
-VIDEO_PATH_TEMP = os.path.join(data_path, "camera", "temp_video_n.mp4")
-TRAJECTORY_PATH_TEMP = os.path.join(data_path, "csv", "temp_trajectory_n.csv")
-TIMESTAMP_PATH_TEMP = os.path.join(data_path, "csv", "temp_video_timestamps_n.csv")
-
-for episode in range(num_episodes):
+def process_episode(episode, config, data_path, cfg):
+    """Process a single episode of data."""
     # Data list preparation
     data_dict = {
         "/observations/qpos": [],
@@ -52,7 +35,6 @@ for episode in range(num_episodes):
         ret, frame = cap.read()
         if ret:
             for cam_name in cfg["camera_names"]:
-                # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 data_dict[f"/observations/images/{cam_name}"].append(frame)
 
     cap.release()
@@ -96,4 +78,34 @@ for episode in range(num_episodes):
 
     print(f"episode_{episode} done!")
 
-print("All episodes completed successfully!")
+def main():
+    # Parse command line arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--task", type=str, default="grasp_cube_v1_24")
+    parser.add_argument("--num_episodes", type=int, default=6)
+    args = parser.parse_args()
+    task = args.task
+    num_episodes = args.num_episodes
+
+    # Load configuration
+    config = load_config()
+    TASK_CONFIG = config["task_config"]
+    cfg = TASK_CONFIG
+
+    # Data path
+    data_path = os.path.join(config["device_settings"]["data_dir"], "dataset", str(task))
+
+    global IMAGE_PATH, CSV_PATH, VIDEO_PATH_TEMP, TRAJECTORY_PATH_TEMP, TIMESTAMP_PATH_TEMP
+    IMAGE_PATH = os.path.join(data_path, "camera/")
+    CSV_PATH = os.path.join(data_path, "csv/")
+    VIDEO_PATH_TEMP = os.path.join(data_path, "camera", "temp_video_n.mp4")
+    TRAJECTORY_PATH_TEMP = os.path.join(data_path, "csv", "temp_trajectory_n.csv")
+    TIMESTAMP_PATH_TEMP = os.path.join(data_path, "csv", "temp_video_timestamps_n.csv")
+
+    for episode in range(num_episodes):
+        process_episode(episode, config, data_path, cfg)
+
+    print("All episodes completed successfully!")
+
+if __name__ == "__main__":
+    main()
