@@ -1,0 +1,38 @@
+{
+    "data_process_config": {
+        "marker_id_0":0,
+        "marker_id_1":1,
+        "input_dir": "your dataset path",
+        "output_joint_dir": "your dataset path",
+        "output_tcp_dir": "your dataset path",
+        "urdf_name": "GEN72.urdf",
+        "aruco_dict": "DICT_4X4_50",
+        "base_position": {
+            "x": 0.199737,
+            "y": -0.00778,
+            "z": 0.550137
+        },
+        "base_orientation": {
+            "roll": -1.295,
+            "pitch": -1.48,
+            "yaw": -1.857
+        },
+        "offset": {
+            "x": 0.14565,
+            "z": 0.1586
+        },
+        "distances": {
+            "marker_max": 566.0,
+            "marker_min": 140.0,
+            "gripper_max": 730.0,
+            "gripper_min": 0,
+            "flange_to_tcp": 0.285
+        },
+        "gripper_offset":{
+            "gen72_gripper_close_to_open": 0.025,
+            "hand_gripper_to_gen72_gripper_open": 0.015
+        },
+        "start_qpos": [0, -0.433, -34.477, -0.003, -126.484, 5.022, 93.425, -0.036],
+        "gripper_threshold": 0.5
+    }
+}
