@@ -81,8 +81,6 @@ pre-commit run --all-files  # 手动运行所有检查
 | Gripper - gear (right) | [Document Link](https://drive.google.com/file/d/1PRu5BUaI0kTnPuThdFy4KCjGtwwTAOPB/view?usp=drive_link) | | |
 | Gripper linkage (left) | [Download Link](https://drive.google.com/file/d/1qKw2cCMWcFLi-hWtbN1qOwUV8XKl2s2F/view?usp=drive_link) | | |
 | Gripper linkage (right) | [Download Link](https://drive.google.com/file/d/1_vO6an-GyXLgplN1rEmrh6NO_rI2ZT8o/view?usp=drive_link) | | |
-| Soft gripper finger (1) | [Download Link](https://drive.google.com/file/d/1UkdiQg-IKoWLUSfIsyC8R-JAkCDqN0it/view?usp=drive_link) | | |
-| Soft gripper finger (2) | [Download Link](https://drive.google.com/file/d/12nBam0ZlLM3t-K5PLpWd5BrZmwcH1TNS/view?usp=drive_link) | | |
 | T265 Mount | [Download Link](https://drive.google.com/file/d/1ntXTOxU6KbD48_x4vxvExIkSOd4qAbLM/view?usp=drive_link) | | |
 | T265 Mount V2 | [Download Link](https://drive.google.com/file/d/1_XOqXdYx--KOUCjkRI4ubGNVTrKC8_7T/view?usp=drive_link) | | |
 | Markers | [Download Link](https://drive.google.com/file/d/1mi3dfh_kN559bwykRgol0a7hC730_6wT/view?usp=drive_link) | | |
@@ -94,7 +92,7 @@ pre-commit run --all-files  # 手动运行所有检查
 ![效果图](./docs/assets/gen72_with_lebai.jpg)
 
 ### 2.3 执行末端
-执行末端使用乐白[LMG-90](https://lebai.ltd/portfolio-item/lmg-90/), 并在其之上设计了Gopro[连接件](./docs/assets/lebai_mount.stp)，可以使用3D打印；
+执行末端使用乐白[LMG-90](https://lebai.ltd/portfolio-item/lmg-90/), 并在其之上设计了Gopro[连接件](./docs/assets/lebai_mount.step), 以及[软手指-需要打印两个](./docs/assets/realman_finger.stp)，可以使用3D打印；
 
 ![效果图](./docs/assets/lebai_mount.jpg)
 
