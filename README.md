@@ -127,7 +127,7 @@ FastUMI没有开放模型训练代码，本仓库补充了ACT算法及DP算法�
   - [ ] 完成一个“将方块放到篮子里“ 的全流程任务
 - 集成Dora-kit
   - [ ] 基于Dora框架运行采集代码
-  - [ ] 存储数据为 [ARIO](https://ario-dataset.github.io/) 格式
+  - [x] 存储数据为 [ARIO](https://ario-dataset.github.io/) 格式
   - [ ] 基于Dora框架运行ACT训练代码
   - [ ] 基于Dora框架运行ACT推理代码
 
