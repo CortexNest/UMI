@@ -98,14 +98,15 @@ pre-commit run --all-files  # 手动运行所有检查
 
 ![效果图](./docs/assets/lebai_mount.jpg)
 
-
 ## 3. 数据采集：
 
 本仓库基于 FastUMI [采集代码](https://github.com/OneStarRobotics/FastUMI_Data)，但对其做了一些优化，数据采集步骤参考[数据采集](./docs/data_collection.md)
 
 ## 4. 模型训练及推理执行
 
-FastUMI没有开放模型训练代码，本仓库补充了ACT算法及DP算法，可以使用不同的算法进行实验；
+FastUMI没有开放模型训练代码，本仓库补充了ACT算法及DP算法，可以使用不同的算法进行实验。
+
+见 https://github.com/tpy001/Isaac-Sim-code， 暂未合并到此仓库。
 
 ### 4.1 ACT（Action Chucking with Transformer) 算法
 参考 [ACT 算法](./src/training/ACT/README.md)
@@ -114,7 +115,6 @@ FastUMI没有开放模型训练代码，本仓库补充了ACT算法及DP算法�
 
 ### 4.2 DP(Difussion Policy) 算法
 参考 [DP 算法](./src/training/DP/README.md)
-
 
 ## 5. 路线图
 - 移植ACT算法，使其适配采集数据格式，能够进行任务训练和推理, 能够控制Gen72-B机械臂执行任务
@@ -130,10 +130,10 @@ FastUMI没有开放模型训练代码，本仓库补充了ACT算法及DP算法�
   - [ ] 存储数据为 [ARIO](https://ario-dataset.github.io/) 格式
   - [ ] 基于Dora框架运行ACT训练代码
   - [ ] 基于Dora框架运行ACT推理代码
+
 ## 6. 现状和不足
  - ACT算法目前可以完成将物体放到篮子里的任务，但泛化能力表现不足，待优化；
  - DP算法在仿真环境下可以完成从采集到训练到推理执行任务，但基于实际采集的数据暂无法很好执行；
-
 
 ## 7. 贡献指南
 
