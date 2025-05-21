@@ -4,12 +4,12 @@
 
 ```
 UMI/
-├── data/               # 存储采集的数据和数据集
+├── dataset/           # 存储采集的数据和数据集
 ├── models/            # 存储训练好的模型
 ├── scripts/           # 实用脚本
 ├── src/               # 源代码
-│   ├── data_collection/    # 数据采集模块
-│   ├── data_processing/    # 数据处理模块
+│   ├── data_collection/   # 数据采集模块
+│   ├── data_processing/   # 数据处理模块
 │   ├── training/          # 模型训练模块
 │   ├── inference/         # 模型推理模块
 │   └── robot_control/     # 机械臂控制模块
@@ -34,10 +34,8 @@ cd UMI
 
 2. 创建虚拟环境：
 ```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# 或
-.\venv\Scripts\activate  # Windows
+conda create -n FastUMI python=3.8.0
+conda activate FastUMI
 ```
 
 3. 安装依赖：
@@ -56,28 +54,6 @@ pre-commit install
 
 ```bash
 pre-commit run --all-files  # 手动运行所有检查
-```
-
-### 1.4 使用方法
-
-1. 数据采集：
-```bash
-python src/data_collection/collect.py --config configs/data_collection.yaml
-```
-
-2. 数据处理：
-```bash
-python src/data_processing/process.py --config configs/data_processing.yaml
-```
-
-3. 模型训练：
-```bash
-python src/training/train.py --config configs/training.yaml
-```
-
-4. 模型推理：
-```bash
-python src/inference/infer.py --config configs/inference.yaml
 ```
 
 ## 2. 硬件环境
@@ -122,7 +98,8 @@ python src/inference/infer.py --config configs/inference.yaml
 
 ![效果图](./docs/assets/lebai_mount.jpg)
 
-## 3. 数据采集
+
+## 3. 数据采集：
 
 本仓库基于 FastUMI [采集代码](https://github.com/OneStarRobotics/FastUMI_Data)，但对其做了一些优化，数据采集步骤参考[数据采集](./docs/data_collection.md)
 
@@ -131,11 +108,13 @@ python src/inference/infer.py --config configs/inference.yaml
 FastUMI没有开放模型训练代码，本仓库补充了ACT算法及DP算法，可以使用不同的算法进行实验；
 
 ### 4.1 ACT（Action Chucking with Transformer) 算法
-参考 [ACT 算法](./algorithms/ACT/README.md)
+参考 [ACT 算法](./src/training/ACT/README.md)
 
 ![推理及执行效果](./docs/assets/act_cube.gif)
 
 ### 4.2 DP(Difussion Policy) 算法
+参考 [DP 算法](./src/training/DP/README.md)
+
 
 ## 5. 路线图
 - 移植ACT算法，使其适配采集数据格式，能够进行任务训练和推理, 能够控制Gen72-B机械臂执行任务

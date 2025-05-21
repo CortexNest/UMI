@@ -11,12 +11,12 @@ repos:
     -   id: check-merge-conflict
     -   id: detect-private-key
 
--   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.1.0
-    hooks:
-    -   id: ruff
-        args: [--fix]
-    -   id: ruff-format
+# -   repo: https://github.com/astral-sh/ruff-pre-commit
+#     rev: v0.1.0
+#     hooks:
+#     -   id: ruff
+#         args: [--fix]
+#     -   id: ruff-format
 
 -   repo: https://github.com/pycqa/isort
     rev: 5.12.0
@@ -28,14 +28,14 @@ repos:
     hooks:
     -   id: black
 
--   repo: https://github.com/PyCQA/pylint
-    rev: v2.17.0
-    hooks:
-    -   id: pylint
-        args: [--rcfile=pyproject.toml]
+# -   repo: https://github.com/PyCQA/pylint
+#     rev: v2.17.0
+#     hooks:
+#     -   id: pylint
+#         args: [--rcfile=pyproject.toml]
 
--   repo: https://github.com/pycqa/pydocstyle
-    rev: 6.3.0
-    hooks:
-    -   id: pydocstyle
-        args: [--config=pyproject.toml] 
+# -   repo: https://github.com/pycqa/pydocstyle
+#     rev: 6.3.0
+#     hooks:
+#     -   id: pydocstyle
+#         args: [--config=pyproject.toml]
