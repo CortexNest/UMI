@@ -1,27 +1,28 @@
+import json
+import os
+from multiprocessing import Pool, cpu_count
+
+import cv2
 import h5py
+import ikpy.chain
 import numpy as np
 from scipy.ndimage import gaussian_filter1d
 from scipy.spatial.transform import Rotation as R
-import os
-import ikpy.chain
-import cv2
 from tqdm import tqdm
-from multiprocessing import Pool, cpu_count
-import json
 
 # Load the configuration from the config.json file
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-config_path = os.path.join(project_root, 'configs', 'data_process.json')
-with open(config_path, 'r') as config_file:
+config_path = os.path.join(project_root, "configs", "data_process.json")
+with open(config_path, "r") as config_file:
     config = json.load(config_file)
 config = config["data_process_config"]
 
 # Extract configuration values
-START_QPOS = config["start_qpos"] # Initial joint positions for the robot
+START_QPOS = config["start_qpos"]  # Initial joint positions for the robot
 
 # Load the robot chain
-urdf_path = os.path.join(project_root, 'assets', config["urdf_name"])
-my_chain = ikpy.chain.Chain.from_urdf_file(urdf_path, base_elements=['base_link'])
+urdf_path = os.path.join(project_root, "assets", config["urdf_name"])
+my_chain = ikpy.chain.Chain.from_urdf_file(urdf_path, base_elements=["base_link"])
 
 # Load predefined ArUco dictionary
 aruco_dict = cv2.aruco.getPredefinedDictionary(getattr(cv2.aruco, config["aruco_dict"]))
@@ -54,9 +55,9 @@ def cartesian_to_joints(position, quaternion, initial_joint_angles=None, **kwarg
     joint_angles = my_chain.inverse_kinematics(
         position,
         rotation_matrix,
-        orientation_mode='all',
+        orientation_mode="all",
         initial_position=initial_joint_angles,
-        regularization_parameter = 0.05
+        regularization_parameter=0.05,
     )
     return joint_angles
 
@@ -94,7 +95,15 @@ def get_gripper_width(img_list):
 
     distances = np.array(distances)
     distances_index = np.array(distances_index)
-    distances = ((distances - config["distances"]["marker_min"]) / (config["distances"]["marker_max"] - config["distances"]["marker_min"]) * config["distances"]["gripper_max"]).astype(np.int16).clip(0, config["distances"]["gripper_max"])
+    distances = (
+        (
+            (distances - config["distances"]["marker_min"])
+            / (config["distances"]["marker_max"] - config["distances"]["marker_min"])
+            * config["distances"]["gripper_max"]
+        )
+        .astype(np.int16)
+        .clip(0, config["distances"]["gripper_max"])
+    )
 
     new_distances = []
     for i in range(len(distances) - 1):
@@ -111,9 +120,11 @@ def get_gripper_width(img_list):
             else:
                 for k in range(distances_index[i + 1] - distances_index[i]):
                     interpolated_distance = int(
-                        k * (distances[i + 1] - distances[i]) /
-                        (distances_index[i + 1] - distances_index[i]) +
-                        distances[i])
+                        k
+                        * (distances[i + 1] - distances[i])
+                        / (distances_index[i + 1] - distances_index[i])
+                        + distances[i]
+                    )
                     new_distances.append(interpolated_distance)
     new_distances.append(distances[-1])
     if len(new_distances) < frame_count:
@@ -131,12 +142,23 @@ def transform_to_base_quat(x, y, z, qx, qy, qz, qw, T_base_to_local):
     T_local = np.eye(4)
     T_local[:3, :3] = rotation_local
     T_local[:3, 3] = [x, y, z]
-    T_base_r = np.dot(T_local[:3, :3], T_base_to_local[:3, :3]) # R_i dot R_base
-    x_base, y_base, z_base = T_base_to_local[:3, 3] + T_local[:3, 3] # p_b2g +p_i
+    T_base_r = np.dot(T_local[:3, :3], T_base_to_local[:3, :3])  # R_i dot R_base
+    x_base, y_base, z_base = T_base_to_local[:3, 3] + T_local[:3, 3]  # p_b2g +p_i
     rotation_base = R.from_matrix(T_base_r)
-    roll_base, pitch_base, yaw_base = rotation_base.as_euler('xyz', degrees=False)
+    roll_base, pitch_base, yaw_base = rotation_base.as_euler("xyz", degrees=False)
     qx_base, qy_base, qz_base, qw_base = rotation_base.as_quat()
-    return x_base, y_base, z_base, qx_base, qy_base, qz_base, qw_base, roll_base, pitch_base, yaw_base
+    return (
+        x_base,
+        y_base,
+        z_base,
+        qx_base,
+        qy_base,
+        qz_base,
+        qw_base,
+        roll_base,
+        pitch_base,
+        yaw_base,
+    )
 
 
 def normalize_ik_and_save_hdf5(args):
@@ -145,20 +167,33 @@ def normalize_ik_and_save_hdf5(args):
     """
     input_file, output_file = args
     # Initial position of the robot's TCP in base (meters)
-    base_x, base_y, base_z = config["base_position"]["x"], config["base_position"]["y"], config["base_position"]["z"]
+    base_x, base_y, base_z = (
+        config["base_position"]["x"],
+        config["base_position"]["y"],
+        config["base_position"]["z"],
+    )
     # Initial orientation of the robot's TCP in base (roll, pitch, yaw format) (rad)
-    base_roll, base_pitch, base_yaw = config["base_orientation"]["roll"], config["base_orientation"]["pitch"], config["base_orientation"]["yaw"]
-    rotation_base_to_local = R.from_euler('xyz', [base_roll, base_pitch, base_yaw]).as_matrix()
+    base_roll, base_pitch, base_yaw = (
+        config["base_orientation"]["roll"],
+        config["base_orientation"]["pitch"],
+        config["base_orientation"]["yaw"],
+    )
+    rotation_base_to_local = R.from_euler("xyz", [base_roll, base_pitch, base_yaw]).as_matrix()
     base_pose, _ = calculate_new_pose(
-        base_x, base_y, base_z, R.from_euler('xyz', [base_roll, base_pitch, base_yaw]).as_quat(), -config["distances"]["flange_to_tcp"])
+        base_x,
+        base_y,
+        base_z,
+        R.from_euler("xyz", [base_roll, base_pitch, base_yaw]).as_quat(),
+        -config["distances"]["flange_to_tcp"],
+    )
 
     T_base_to_local = np.eye(4)
     T_base_to_local[:3, :3] = rotation_base_to_local
     T_base_to_local[:3, 3] = [base_pose[0], base_pose[1], base_pose[2]]
 
-    with h5py.File(input_file, 'r') as f_in:
-        action_data = f_in['action'][:]
-        qpos_data = f_in['observations/qpos'][:]
+    with h5py.File(input_file, "r") as f_in:
+        action_data = f_in["action"][:]
+        qpos_data = f_in["observations/qpos"][:]
         normalized_qpos = np.copy(qpos_data)
 
         for i in range(normalized_qpos.shape[0]):
@@ -167,8 +202,18 @@ def normalize_ik_and_save_hdf5(args):
             pos -= config["offset"]["x"] * rotation_base_to_local[:, 2]
             pos += config["offset"]["z"] * rotation_base_to_local[:, 0]
             x, y, z = pos
-            x_base, y_base, z_base, qx_base, qy_base, qz_base, qw_base, _, _, _ = transform_to_base_quat(
-                x, y, z, qx, qy, qz, qw, T_base_to_local)
+            (
+                x_base,
+                y_base,
+                z_base,
+                qx_base,
+                qy_base,
+                qz_base,
+                qw_base,
+                _,
+                _,
+                _,
+            ) = transform_to_base_quat(x, y, z, qx, qy, qz, qw, T_base_to_local)
             ori = R.from_quat([qx_base, qy_base, qz_base, qw_base]).as_matrix()
             pos = np.array([x_base, y_base, z_base])
             pos += config["offset"]["x"] * ori[:, 2]
@@ -178,7 +223,7 @@ def normalize_ik_and_save_hdf5(args):
 
         joint_angles = []
         action_data = np.copy(normalized_qpos)
-        image_data = f_in['observations/images/front'][:]
+        image_data = f_in["observations/images/front"][:]
         qpos_data = normalized_qpos
         data = np.array(action_data)
 
@@ -193,14 +238,15 @@ def normalize_ik_and_save_hdf5(args):
             direction = np.array(pose[:3])
             q = np.array(pose[3:])
 
-            direction, q = calculate_new_pose(direction[0], direction[1], direction[2], q, config["distances"]["flange_to_tcp"])
+            direction, q = calculate_new_pose(
+                direction[0], direction[1], direction[2], q, config["distances"]["flange_to_tcp"]
+            )
 
             ### 动态误差
             offset_rate = gripper_width[i]
             d_i = config["gripper_offset"]["gen72_gripper_close_to_open"] * (1 - offset_rate)
             offset = d_i - config["gripper_offset"]["hand_gripper_to_gen72_gripper_open"]
-            direction, q = calculate_new_pose(
-                direction[0], direction[1], direction[2], q, offset)
+            direction, q = calculate_new_pose(direction[0], direction[1], direction[2], q, offset)
 
             if i == 0:
                 initial_joint_angles = np.deg2rad(START_QPOS)
@@ -219,28 +265,28 @@ def normalize_ik_and_save_hdf5(args):
             else:
                 gripper_width[i] = 1
 
-        new_joint_angles = np.concatenate(
-            (joint_angles, gripper_width), axis=1)
+        new_joint_angles = np.concatenate((joint_angles, gripper_width), axis=1)
 
-        with h5py.File(output_file, 'w') as f_out:
-            f_out.create_dataset('action', data=new_joint_angles)
-            observations_group = f_out.create_group('observations')
-            images_group = observations_group.create_group('images')
+        with h5py.File(output_file, "w") as f_out:
+            f_out.create_dataset("action", data=new_joint_angles)
+            observations_group = f_out.create_group("observations")
+            images_group = observations_group.create_group("images")
 
-            max_timesteps = f_in['observations/images/front'].shape[0]
-            cam_hight = f_in['observations/images/front'].shape[1]
-            cam_width = f_in['observations/images/front'].shape[2]
+            max_timesteps = f_in["observations/images/front"].shape[0]
+            cam_hight = f_in["observations/images/front"].shape[1]
+            cam_width = f_in["observations/images/front"].shape[2]
 
             images_group.create_dataset(
-                'front',
+                "front",
                 (max_timesteps, cam_hight, cam_width, 3),
-                dtype='uint8',
+                dtype="uint8",
                 chunks=(1, cam_hight, cam_width, 3),
-                compression='gzip',
-                compression_opts=4)
-            images_group['front'][:] = f_in['observations/images/front'][:]
+                compression="gzip",
+                compression_opts=4,
+            )
+            images_group["front"][:] = f_in["observations/images/front"][:]
 
-            observations_group.create_dataset('qpos', data=new_joint_angles)
+            observations_group.create_dataset("qpos", data=new_joint_angles)
 
             print(f"Processed and saved: {output_file}")
 
@@ -252,7 +298,7 @@ if __name__ == "__main__":
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    file_list = [f for f in os.listdir(input_dir) if f.endswith('.hdf5')]
+    file_list = [f for f in os.listdir(input_dir) if f.endswith(".hdf5")]
     args_list = []
     for f in file_list:
         input_file = os.path.join(input_dir, f)
@@ -262,6 +308,12 @@ if __name__ == "__main__":
 
     num_processes = cpu_count()
     with Pool(num_processes) as pool:
-        list(tqdm(pool.imap_unordered(normalize_ik_and_save_hdf5, args_list), total=len(args_list), desc="Processing files"))
+        list(
+            tqdm(
+                pool.imap_unordered(normalize_ik_and_save_hdf5, args_list),
+                total=len(args_list),
+                desc="Processing files",
+            )
+        )
 
     print("Processing completed.")

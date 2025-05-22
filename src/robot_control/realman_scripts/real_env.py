@@ -1,49 +1,51 @@
+import collections
 import time
+from collections import deque
+
 import cv2
 import numpy as np
-import collections
-from Robotic_Arm.rm_robot_interface import *
-from collections import deque
 import rospy
 from cv_bridge import CvBridge
-from sensor_msgs.msg import Image
+
 # from threading import Lock
-from realman_scripts.robot_config import ROBOT_CONFIG, CAMERA_CONFIG
+from realman_scripts.robot_config import CAMERA_CONFIG, ROBOT_CONFIG
+from Robotic_Arm.rm_robot_interface import *
+from sensor_msgs.msg import Image
 
-ROBOT_IP = ROBOT_CONFIG['robot_ip']
-ROBOT_PORT = ROBOT_CONFIG['robot_port']
-START_JOINT = ROBOT_CONFIG['original_joints']
-START_WIDTH = ROBOT_CONFIG['original_gripper_width']
-OPEN_WIDTH = ROBOT_CONFIG['gripper_open_width']
-CLOSE_WIDTH = ROBOT_CONFIG['gripper_close_width']
-GRIPPER_THRESHOLD = ROBOT_CONFIG['gripper_threshold']
+ROBOT_IP = ROBOT_CONFIG["robot_ip"]
+ROBOT_PORT = ROBOT_CONFIG["robot_port"]
+START_JOINT = ROBOT_CONFIG["original_joints"]
+START_WIDTH = ROBOT_CONFIG["original_gripper_width"]
+OPEN_WIDTH = ROBOT_CONFIG["gripper_open_width"]
+CLOSE_WIDTH = ROBOT_CONFIG["gripper_close_width"]
+GRIPPER_THRESHOLD = ROBOT_CONFIG["gripper_threshold"]
 
-CAMERA_LIST = CAMERA_CONFIG['camera_list']
-IMAGE_WIDTH = CAMERA_CONFIG['input_image_width']
-IMAGE_HEIGHT = CAMERA_CONFIG['input_image_height']
+CAMERA_LIST = CAMERA_CONFIG["camera_list"]
+IMAGE_WIDTH = CAMERA_CONFIG["input_image_width"]
+IMAGE_HEIGHT = CAMERA_CONFIG["input_image_height"]
+
 
 class ImageRecorder:
     def __init__(self, init_node=True, is_debug=False):
-
         self.is_debug = is_debug
         self.bridge = CvBridge()
         self.camera_names = CAMERA_LIST
 
         if init_node:
-            rospy.init_node('image_recorder', anonymous=True)
+            rospy.init_node("image_recorder", anonymous=True)
 
         for cam_name in self.camera_names:
-            setattr(self, f'{cam_name}_image', None)
-            setattr(self, f'{cam_name}_secs', None)
-            setattr(self, f'{cam_name}_nsecs', None)
-            if cam_name == 'front':
+            setattr(self, f"{cam_name}_image", None)
+            setattr(self, f"{cam_name}_secs", None)
+            setattr(self, f"{cam_name}_nsecs", None)
+            if cam_name == "front":
                 callback_func = self.image_cb_cam_front
             else:
                 raise NotImplementedError
             rospy.Subscriber("/usb_cam/image_raw", Image, callback_func, queue_size=1000)
             if self.is_debug:
-                setattr(self, f'{cam_name}_timestamps', deque(maxlen=50))
-                
+                setattr(self, f"{cam_name}_timestamps", deque(maxlen=50))
+
         time.sleep(1)
 
     def image_cb(self, cam_name, data):
@@ -56,22 +58,26 @@ class ImageRecorder:
         # image = cv2.resize(img_bgr, (IMAGE_WIDTH, IMAGE_HEIGHT), interpolation=cv2.INTER_LINEAR)
         # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        raw_img = self.bridge.imgmsg_to_cv2(data, desired_encoding='bgr8') # 1080x1920x3
-        image = cv2.resize(np.array(raw_img), (IMAGE_WIDTH, IMAGE_HEIGHT), interpolation=cv2.INTER_LINEAR) # 360x640x3
-        setattr(self, f'{cam_name}_image', image)
-        setattr(self, f'{cam_name}_secs', data.header.stamp.secs)
-        setattr(self, f'{cam_name}_nsecs', data.header.stamp.nsecs)
+        raw_img = self.bridge.imgmsg_to_cv2(data, desired_encoding="bgr8")  # 1080x1920x3
+        image = cv2.resize(
+            np.array(raw_img), (IMAGE_WIDTH, IMAGE_HEIGHT), interpolation=cv2.INTER_LINEAR
+        )  # 360x640x3
+        setattr(self, f"{cam_name}_image", image)
+        setattr(self, f"{cam_name}_secs", data.header.stamp.secs)
+        setattr(self, f"{cam_name}_nsecs", data.header.stamp.nsecs)
         if self.is_debug:
-            getattr(self, f'{cam_name}_timestamps').append(data.header.stamp.secs + data.header.stamp.secs * 1e-9)
+            getattr(self, f"{cam_name}_timestamps").append(
+                data.header.stamp.secs + data.header.stamp.secs * 1e-9
+            )
 
     def image_cb_cam_front(self, data):
-        cam_name = 'front'
+        cam_name = "front"
         self.image_cb(cam_name, data)
 
     def get_images(self):
         image_dict = dict()
         for cam_name in self.camera_names:
-            image_dict[cam_name] = getattr(self, f'{cam_name}_image')
+            image_dict[cam_name] = getattr(self, f"{cam_name}_image")
         return image_dict
 
     def print_diagnostics(self):
@@ -79,10 +85,12 @@ class ImageRecorder:
             l = np.array(l)
             diff = l[1:] - l[:-1]
             return np.mean(diff)
+
         for cam_name in self.camera_names:
-            image_freq = 1 / dt_helper(getattr(self, f'{cam_name}_timestamps'))
-            print(f'{cam_name} {image_freq=:.2f}')
+            image_freq = 1 / dt_helper(getattr(self, f"{cam_name}_timestamps"))
+            print(f"{cam_name} {image_freq=:.2f}")
         print()
+
 
 class RealEnv:
     """
@@ -93,6 +101,7 @@ class RealEnv:
                                         gripper_qpos (1)]     # normalized gripper position (0: close, 1: open)
                         "images": "front": (360x640x3) }    # h, w, c, bgr, dtype='uint8'
     """
+
     def __init__(self):
         self.arm = None
         self.handle = None
@@ -110,8 +119,8 @@ class RealEnv:
             print("set voltage success")
         else:
             raise Exception("set voltage failed")
-        
-        if self.arm.rm_set_modbus_mode(1,115200,2) == 0:
+
+        if self.arm.rm_set_modbus_mode(1, 115200, 2) == 0:
             print("set modbus success")
         else:
             raise Exception("set modbus failed")
@@ -200,8 +209,8 @@ class RealEnv:
 
     def get_observation(self):
         obs = collections.OrderedDict()
-        obs['qpos'] = self.get_qpos()
-        obs['images'] = self.get_images()
+        obs["qpos"] = self.get_qpos()
+        obs["images"] = self.get_images()
         return obs
 
     def reset(self):

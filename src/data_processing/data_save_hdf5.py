@@ -8,11 +8,13 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
+
 def load_config():
     """Load configuration from config file."""
     with open("configs/data_collection.json") as f:
         config = json.load(f)
     return config
+
 
 def process_episode(episode, config, data_path, cfg):
     """Process a single episode of data."""
@@ -78,6 +80,7 @@ def process_episode(episode, config, data_path, cfg):
 
     print(f"episode_{episode} done!")
 
+
 def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser()
@@ -106,6 +109,7 @@ def main():
         process_episode(episode, config, data_path, cfg)
 
     print("All episodes completed successfully!")
+
 
 if __name__ == "__main__":
     main()

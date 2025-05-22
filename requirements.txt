@@ -18,6 +18,10 @@ pyrealsense2
 csvkit
 apriltag
 pandas
+opencv-python
+
+# Gen72-BSDK
+Robotic_Arm==1.0.1
 
 # 工具和工具包
 tqdm>=4.62.0
