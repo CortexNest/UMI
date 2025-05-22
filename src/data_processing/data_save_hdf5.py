@@ -81,8 +81,8 @@ def process_episode(episode, config, data_path, cfg):
 def main():
     # Parse command line arguments
     parser = argparse.ArgumentParser()
-    parser.add_argument("--task", type=str, default="grasp_cube_v1_24")
-    parser.add_argument("--num_episodes", type=int, default=6)
+    parser.add_argument("--task", type=str, default="task_name")
+    parser.add_argument("--num_episodes", type=int, default=1)
     args = parser.parse_args()
     task = args.task
     num_episodes = args.num_episodes

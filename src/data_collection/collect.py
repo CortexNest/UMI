@@ -22,7 +22,7 @@ from tqdm import tqdm
 class DataCollector:
     """数据采集器类，用于从各种传感器收集数据"""
 
-    def __init__(self, config_path: str, task: str = "grasp_cube_v1_24", num_episodes: int = 6):
+    def __init__(self, config_path: str, task: str, num_episodes: int):
         """
         初始化数据采集器
 
@@ -274,8 +274,8 @@ def main():
         default="configs/data_collection.json",
         help="Path to configuration file",
     )
-    parser.add_argument("--task", type=str, default="grasp_cube_v1_24", help="Task name")
-    parser.add_argument("--num_episodes", type=int, default=6, help="Number of episodes to record")
+    parser.add_argument("--task", type=str, default="task_name", help="Task name")
+    parser.add_argument("--num_episodes", type=int, default=1, help="Number of episodes to record")
     args = parser.parse_args()
 
     collector = DataCollector(args.config, args.task, args.num_episodes)
