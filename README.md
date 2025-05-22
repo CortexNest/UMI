@@ -35,7 +35,7 @@ cd UMI
 
 2. 创建虚拟环境：
 ```bash
-conda create -n FastUMI python=3.8.0
+conda create -n FastUMI python=3.10.4
 conda activate FastUMI
 ```
 
@@ -48,14 +48,6 @@ pip install -r requirements.txt
 ```bash
 pre-commit install
 ```
-
-#### 1.2.1 数据采集环境安装
-
-https://github.com/RealRobotSquad/FastUMI_Data
-
-#### 1.2.2 ACT模型训练及部署环境安装
-
-#### 1.2.3 DP模型训练及部署环境安装
 
 ### 1.3 代码质量工具
 
@@ -109,38 +101,7 @@ pre-commit run --all-files  # 手动运行所有检查
 
 ## 3. 数据采集及处理：
 
-本仓库基于 FastUMI [采集代码](https://github.com/OneStarRobotics/FastUMI_Data)，但对其做了一些优化，数据采集步骤参考[数据采集](./docs/data_collection.md)
-
-### 3.1 数据采集
-
-#### 3.1.1 启动 ROS Core
-启动 roscore:
-
-    roscore
-
-#### 3.1.2 连接 RealSense T265 与 GoPro
-- 启动 T265 与 GoPro 的 ROS 节点
-- GoPro launch配置见 `src/data_collection/usb_cam-launch.launch`
-```
-roslaunch realsense2_camera rs_t265.launch
-roslaunch usb_cam usb_cam-test.launch
-```
-#### 3.1.3 运行采集脚本
-- 修改 `configs/data_collection.json` 中的路径
-- 运行采集脚本:
-```
-python scr/data_collection/collect.py --task your_task_name --num_episodes 1
-```
-
-#### 3.1.4 保存数据
-- 保存为 hdf5 文件
-```
-python src/data_processing/data_save_hdf5.py --task your_task_name --num_episodes 1
-```
-- 保存为 ARIO 格式
-```
-python src/data_processing/data_save_ario.py --task your_task_name --num_episodes 1
-```
+本仓库基于 [FastUMI采集代码](https://github.com/OneStarRobotics/FastUMI_Data)，但对其做了一些优化，数据采集步骤参考[数据采集](./docs/data_collection.md)
 
 ### 3.1 数据后处理
 `configs/data_process.json`配置文件说明：
@@ -155,14 +116,25 @@ python src/data_processing/data_save_ario.py --task your_task_name --num_episode
 - **start_qpos**: 初始关节角度
 - **gripper_threshold**: 夹爪开关阈值
 
-#### 3.1.1 原始数据转化为TCP位姿数据
+#### 3.1.1 保存数据
+- 保存为 hdf5 文件
+```
+python src/data_processing/data_save_hdf5.py --task your_task_name --num_episodes 1
+```
+- 保存为 ARIO 格式
+```
+python src/data_processing/data_save_ario.py --task your_task_name --num_episodes 1
+```
+
+#### 3.1.2 原始数据转化为TCP位姿数据
 ```
 python src/data_processing/data_processing_to_tcp.py
 ```
-#### 3.1.2 原始数据转化为关节角度数据
+#### 3.1.3 原始数据转化为关节角度数据
 ```
 python src/data_processing/data_processing_to_joint.py
 ```
+
 ## 4. 模型训练及推理执行
 
 FastUMI没有开放模型训练代码，本仓库补充了ACT算法及DP算法，可以使用不同的算法进行实验。
