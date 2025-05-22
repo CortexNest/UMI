@@ -66,6 +66,6 @@ Launch RViz:
 - Update the data saving path in the script.
 - Run the data collection script:
 ```python
-python src/data_collection/collect.py --config configs/data_collection.json --task grasp_cube_v1_24 --num_episodes 6
+python src/data_collection/collect.py --config configs/data_collection.json --task your_task_name --num_episodes 10
 ```
 ---

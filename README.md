@@ -35,7 +35,7 @@ cd UMI
 
 2. 创建虚拟环境：
 ```bash
-conda create -n FastUMI python=3.8.0
+conda create -n FastUMI python=3.10.4
 conda activate FastUMI
 ```
 
@@ -48,10 +48,6 @@ pip install -r requirements.txt
 ```bash
 pre-commit install
 ```
-
-#### 1.2.1 数据采集环境安装
-TODO\
-https://github.com/RealRobotSquad/FastUMI_Data
 
 #### 1.2.2 ACT模型训练及部署环境安装
 
@@ -76,8 +72,6 @@ pip install Robotic_Arm==1.0.1
 cd src/training/ACT/detr && pip install -e .
 ```
 
-#### 1.2.3 DP模型训练及部署环境安装
-TODO
 ### 1.3 代码质量工具
 
 项目使用 pre-commit 在提交代码前自动运行检查：
@@ -111,57 +105,24 @@ pre-commit run --all-files  # 手动运行所有检查
 | Gripper - gear (right) | [Document Link](https://drive.google.com/file/d/1PRu5BUaI0kTnPuThdFy4KCjGtwwTAOPB/view?usp=drive_link) | | |
 | Gripper linkage (left) | [Download Link](https://drive.google.com/file/d/1qKw2cCMWcFLi-hWtbN1qOwUV8XKl2s2F/view?usp=drive_link) | | |
 | Gripper linkage (right) | [Download Link](https://drive.google.com/file/d/1_vO6an-GyXLgplN1rEmrh6NO_rI2ZT8o/view?usp=drive_link) | | |
-| Soft gripper finger (1) | [Download Link](https://drive.google.com/file/d/1UkdiQg-IKoWLUSfIsyC8R-JAkCDqN0it/view?usp=drive_link) | | |
-| Soft gripper finger (2) | [Download Link](https://drive.google.com/file/d/12nBam0ZlLM3t-K5PLpWd5BrZmwcH1TNS/view?usp=drive_link) | | |
 | T265 Mount | [Download Link](https://drive.google.com/file/d/1ntXTOxU6KbD48_x4vxvExIkSOd4qAbLM/view?usp=drive_link) | | |
 | T265 Mount V2 | [Download Link](https://drive.google.com/file/d/1_XOqXdYx--KOUCjkRI4ubGNVTrKC8_7T/view?usp=drive_link) | | |
 | Markers | [Download Link](https://drive.google.com/file/d/1mi3dfh_kN559bwykRgol0a7hC730_6wT/view?usp=drive_link) | | |
 
-![效果图](./docs/assets/gripper.png)
+![效果图](./docs/images/gripper.png)
 
 ### 2.2 机械臂
 机械臂使用[Realman Gen72-B](https://www.realman-robotics.cn/products/gen72b)
-![效果图](./docs/assets/gen72_with_lebai.jpg)
+![效果图](./docs/images/gen72_with_lebai.jpg)
 
 ### 2.3 执行末端
-执行末端使用乐白[LMG-90](https://lebai.ltd/portfolio-item/lmg-90/), 并在其之上设计了Gopro[连接件](./docs/assets/lebai_mount.stp)，可以使用3D打印；
+执行末端使用乐白[LMG-90](https://lebai.ltd/portfolio-item/lmg-90/), 并在其之上设计了Gopro[连接件](./assets/lebai_mount.step), 以及[软手指-需要打印两个](./assets/realman_finger.stp)，可以使用3D打印；
 
-![效果图](./docs/assets/lebai_mount.jpg)
+![效果图](./docs/images/lebai_mount.jpg)
 
 ## 3. 数据采集及处理：
 
-本仓库基于 FastUMI [采集代码](https://github.com/OneStarRobotics/FastUMI_Data)，但对其做了一些优化，数据采集步骤参考[数据采集](./docs/data_collection.md)
-
-### 3.1 数据采集
-
-#### 3.1.1 启动 ROS Core
-启动 roscore:
-
-    roscore
-
-#### 3.1.2 连接 RealSense T265 与 GoPro
-- 启动 T265 与 GoPro 的 ROS 节点
-- GoPro launch配置见 `src/data_collection/usb_cam-launch.launch`
-```
-roslaunch realsense2_camera rs_t265.launch
-roslaunch usb_cam usb_cam-test.launch
-```
-#### 3.1.3 运行采集脚本
-- 修改 `configs/data_collection.json` 中的路径
-- 运行采集脚本:
-```
-python scr/data_collection/collect.py --task your_task_name --num_episodes 1
-```
-
-#### 3.1.4 保存数据
-- 保存为 hdf5 文件
-```
-python src/data_processing/data_save_hdf5.py --task your_task_name --num_episodes 1
-```
-- 保存为 ARIO 格式
-```
-python src/data_processing/data_save_ario.py --task your_task_name --num_episodes 1
-```
+本仓库基于 [FastUMI采集代码](https://github.com/OneStarRobotics/FastUMI_Data)，但对其做了一些优化，数据采集步骤参考[数据采集](./docs/data_collection.md)
 
 ### 3.1 数据后处理
 `configs/data_process.json`配置文件说明：
@@ -176,14 +137,25 @@ python src/data_processing/data_save_ario.py --task your_task_name --num_episode
 - **start_qpos**: 初始关节角度
 - **gripper_threshold**: 夹爪开关阈值
 
-#### 3.1.1 原始数据转化为TCP位姿数据
+#### 3.1.1 保存数据
+- 保存为 hdf5 文件
+```
+python src/data_processing/data_save_hdf5.py --task your_task_name --num_episodes 1
+```
+- 保存为 ARIO 格式
+```
+python src/data_processing/data_save_ario.py --task your_task_name --num_episodes 1
+```
+
+#### 3.1.2 原始数据转化为TCP位姿数据
 ```
 python src/data_processing/data_processing_to_tcp.py
 ```
-#### 3.1.2 原始数据转化为关节角度数据
+#### 3.1.3 原始数据转化为关节角度数据
 ```
 python src/data_processing/data_processing_to_joint.py
 ```
+
 ## 4. 模型训练及推理执行
 
 FastUMI没有开放模型训练代码，本仓库补充了ACT算法及DP算法，可以使用不同的算法进行实验。
@@ -226,7 +198,7 @@ For real-world data where things can be harder to model, train for at least 5000
 Please refer to [tuning tips](https://docs.google.com/document/d/1FVIZfoALXg_ZkYKaYVh-qOlaXveq5CtvJHXkY25eYhs/edit?usp=sharing) for more info.
 
 
-![推理及执行效果](./docs/assets/act_cube.gif)
+![推理及执行效果](./docs/images/act_cube.gif)
 
 ### 4.2 DP(Difussion Policy) 算法
 参考 [DP 算法](./src/training/DP/README.md)
