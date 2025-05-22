@@ -137,15 +137,14 @@ python src/data_processing/data_processing_to_joint.py
 
 FastUMI没有开放模型训练代码，本仓库补充了ACT算法及DP算法，可以使用不同的算法进行实验。
 
-见 https://github.com/tpy001/Isaac-Sim-code， 暂未合并到此仓库。
-
 ### 4.1 ACT（Action Chucking with Transformer) 算法
 参考 [ACT 算法](./src/training/ACT/README.md)
 
 ![推理及执行效果](./docs/images/act_cube.gif)
 
 ### 4.2 DP(Difussion Policy) 算法
-参考 [DP 算法](./src/training/DP/README.md)
+见 https://github.com/tpy001/Isaac-Sim-code， DP算法暂未合并到此仓库。
+<!-- 参考 [DP 算法](./src/training/DP/README.md) -->
 
 ## 5. 路线图
 - 移植ACT算法，使其适配采集数据格式，能够进行任务训练和推理, 能够控制Gen72-B机械臂执行任务
