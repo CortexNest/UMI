@@ -1,4 +1,27 @@
-## 训练
+## 1. 环境安装
+
+```
+conda create -n act python=3.9
+conda activate act
+pip install torchvision
+pip install torch
+pip install pyquaternion
+pip install pyyaml
+pip install rospkg
+pip install pexpect
+pip install mujoco==2.3.7
+pip install dm_control==1.0.14
+pip install opencv-python
+pip install matplotlib
+pip install einops
+pip install packaging
+pip install h5py
+pip install ipython
+pip install Robotic_Arm==1.0.1
+cd src/training/ACT/detr && pip install -e .
+```
+
+## 2. 模型训练
     
     python3 src/training/ACT/train.py \
     --task_name <task_name> \
@@ -7,7 +30,7 @@
     --num_epochs 20000  --lr 1e-5 \
     --seed 0
 
-## 推理
+## 模型推理
 
 启动 roscore:
 
