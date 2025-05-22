@@ -86,16 +86,16 @@ pre-commit run --all-files  # 手动运行所有检查
 | T265 Mount V2 | [Download Link](https://drive.google.com/file/d/1_XOqXdYx--KOUCjkRI4ubGNVTrKC8_7T/view?usp=drive_link) | | |
 | Markers | [Download Link](https://drive.google.com/file/d/1mi3dfh_kN559bwykRgol0a7hC730_6wT/view?usp=drive_link) | | |
 
-![效果图](./docs/assets/gripper.png)
+![效果图](./docs/images/gripper.png)
 
 ### 2.2 机械臂
 机械臂使用[Realman Gen72-B](https://www.realman-robotics.cn/products/gen72b)
-![效果图](./docs/assets/gen72_with_lebai.jpg)
+![效果图](./docs/images/gen72_with_lebai.jpg)
 
 ### 2.3 执行末端
-执行末端使用乐白[LMG-90](https://lebai.ltd/portfolio-item/lmg-90/), 并在其之上设计了Gopro[连接件](./docs/assets/lebai_mount.step), 以及[软手指-需要打印两个](./docs/assets/realman_finger.stp)，可以使用3D打印；
+执行末端使用乐白[LMG-90](https://lebai.ltd/portfolio-item/lmg-90/), 并在其之上设计了Gopro[连接件](./assets/lebai_mount.step), 以及[软手指-需要打印两个](./assets/realman_finger.stp)，可以使用3D打印；
 
-![效果图](./docs/assets/lebai_mount.jpg)
+![效果图](./docs/images/lebai_mount.jpg)
 
 ## 3. 数据采集及处理：
 
@@ -142,7 +142,7 @@ FastUMI没有开放模型训练代码，本仓库补充了ACT算法及DP算法�
 ### 4.1 ACT（Action Chucking with Transformer) 算法
 参考 [ACT 算法](./src/training/ACT/README.md)
 
-![推理及执行效果](./docs/assets/act_cube.gif)
+![推理及执行效果](./docs/images/act_cube.gif)
 
 ### 4.2 DP(Difussion Policy) 算法
 参考 [DP 算法](./src/training/DP/README.md)
